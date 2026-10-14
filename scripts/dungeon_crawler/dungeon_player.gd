@@ -3,6 +3,19 @@ extends Node3D
 
 @export var do_keyboard_movement: bool = true
 
+@export_group("Wall Cutout")
+@export_flags_3d_physics var occluder_collision_mask: int = 2
+@export var occlusion_sample_offsets: Array[Vector3] = [
+	Vector3.ZERO,
+	Vector3(0.0, -0.4, 0.0),
+	Vector3(-4.0, 0.0, 0.0),
+	Vector3(0.0, 0.4, 0.0),
+	Vector3(4.0, 0.0, 0.0),
+]
+@export var occlusion_tolerance: float = 0.15
+@export var cutout_open_time: float = 0.15 # s
+@export var cutout_close_time: float = 0.3 # s
+
 @export_flags_3d_physics var click_collision_mask: int = 1
 @export var ray_length: float = 1000.0;
 
@@ -27,6 +40,9 @@ var input_dir: Vector2 = Vector2.ZERO
 
 var click_requested: bool = false
 var has_destination: bool = false
+
+var cutout_target: float = 0.0
+var cutout_amount: float = 0.0
 
 func _get_button(event: InputEvent, action: StringName, previous: bool) -> bool:
 	if event.is_action_pressed(action):
@@ -74,8 +90,37 @@ func _do_camera_movement(delta: float) -> void:
 		-camera.global_basis.z
 	)
 
+func _update_occlusion_target() -> void:
+	var space: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
+	var blocked: bool = false
+	
+	for offset in occlusion_sample_offsets:
+		var target: Vector3 = rigidbody.global_position + offset
+		var origin: Vector3 = camera.project_ray_origin(
+			camera.unproject_position(target)
+		)
+		var end: Vector3 = target.move_toward(origin, occlusion_tolerance)
+		
+		var query := PhysicsRayQueryParameters3D.create(
+			origin, end, occluder_collision_mask
+		)
+		query.exclude = [rigidbody.get_rid()]
+		
+		if not space.intersect_ray(query).is_empty():
+			blocked = true
+			break
+	
+	cutout_target = 1.0 if blocked else 0.0
+ 
+func _update_cutout(delta: float) -> void:
+	var time: float = cutout_open_time if cutout_target > cutout_amount \
+		else cutout_close_time
+	cutout_amount = move_toward(cutout_amount, cutout_target, delta / maxf(time, 0.001))
+	RenderingServer.global_shader_parameter_set("cutout_amount", cutout_amount)
+
 func _process(delta: float) -> void:
 	_do_camera_movement(delta)
+	_update_cutout(delta)
 
 func _apply_horizontal_velocity(target_velocity: Vector3, step: float) -> void:
 	var vel: Vector3 = rigidbody.linear_velocity
@@ -163,6 +208,8 @@ func _do_mouse_movement(delta: float) -> void:
 	_apply_horizontal_velocity(target_velocity, step)
 
 func _physics_process(delta: float) -> void:
+	_update_occlusion_target()
+	
 	if do_keyboard_movement:
 		_do_keyboard_movement(delta)
 	else:
