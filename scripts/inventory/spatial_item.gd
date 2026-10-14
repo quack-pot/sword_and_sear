@@ -2,38 +2,41 @@
 class_name SpatialItem
 extends Resource
 
-enum ItemIds {
-	CABBAGE = 0
-}
+@export var item_id: GlobalItemData.ItemIds = GlobalItemData.ItemIds.EMPTY
 
-@export var item_id: ItemIds = ItemIds.CABBAGE
+var _syncing_size: bool = false
 
 @export_range(1, 32, 1, "or_greater") var grid_width: int = 1:
 	set(value):
 		grid_width = maxi(value, 1)
-		_refit_pattern()
+		if not _syncing_size:
+			_refit_pattern()
 
 @export_range(1, 32, 1, "or_greater") var grid_height: int = 1:
 	set(value):
 		grid_height = maxi(value, 1)
-		_refit_pattern()
+		if not _syncing_size:
+			_refit_pattern()
 
-@export var grid_pattern: Array[Array] = [[true]]
+@export var grid_pattern: Array[Array] = [[true]]:
+	set(value):
+		var rows := value.size()
+		var cols := 0
+		for row in value:
+			cols = maxi(cols, row.size())
+		
+		_syncing_size = true
+		grid_height = rows
+		grid_width = cols
+		_syncing_size = false
+		
+		grid_pattern = _fit_pattern(value)
+		
+		emit_changed()
+		if Engine.is_editor_hint():
+			notify_property_list_changed()
 
 @export var item_image: Texture2D
-
-func _init(
-	p_item_id: ItemIds = ItemIds.CABBAGE,
-	p_grid_width: int = 1,
-	p_grid_height: int = 1,
-	p_grid_pattern: Array[Array] = [[true]],
-	p_item_image: Texture2D = null
-) -> void:
-	item_id = p_item_id
-	grid_width = p_grid_width
-	grid_height = p_grid_height
-	grid_pattern = p_grid_pattern
-	item_image = p_item_image
 
 func _refit_pattern() -> void:
 	grid_pattern = _fit_pattern(grid_pattern)
