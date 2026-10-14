@@ -28,10 +28,6 @@ var input_dir: Vector2 = Vector2.ZERO
 var click_requested: bool = false
 var has_destination: bool = false
 
-func _ready() -> void:
-	nav_agent.path_desired_distance = 0.3
-	nav_agent.target_desired_distance = 0.2
-
 func _get_button(event: InputEvent, action: StringName, previous: bool) -> bool:
 	if event.is_action_pressed(action):
 		return true
