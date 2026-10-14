@@ -23,6 +23,10 @@ window/stretch/aspect="expand"
 
 project/assembly_name="sword_and_sear"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/spatial_item_editor/plugin.cfg")
+
 [input]
 
 Up={
