@@ -1,23 +1,26 @@
 class_name DungeonPlayer
 extends Node3D
 
-@export var do_keyboard_movement: bool = true
-
 @export_group("Wall Cutout")
 @export_flags_3d_physics var occluder_collision_mask: int = 2
 @export var occlusion_sample_offsets: Array[Vector3] = [
 	Vector3.ZERO,
 	Vector3(0.0, -0.4, 0.0),
-	Vector3(-4.0, 0.0, 0.0),
 	Vector3(0.0, 0.4, 0.0),
-	Vector3(4.0, 0.0, 0.0),
 ]
 @export var occlusion_tolerance: float = 0.15
 @export var cutout_open_time: float = 0.15 # s
 @export var cutout_close_time: float = 0.3 # s
 
+@export_group("Mouse Movement")
 @export_flags_3d_physics var click_collision_mask: int = 1
 @export var ray_length: float = 1000.0;
+
+@export var mouse_indicator: PackedScene
+@export var mouse_indicator_offset: float = 1.0
+
+@export_group("General Movement")
+@export var do_keyboard_movement: bool = true
 
 @export var max_velocity: float = 10.0 # m/s
 @export var acceleration: float = 40.0 # m/s^2
@@ -27,6 +30,7 @@ extends Node3D
 @onready var sprite: Sprite3D = $RigidBody3D/Sprite3D
 @onready var nav_agent: NavigationAgent3D = $RigidBody3D/NavigationAgent3D
 
+@export_group("Camera Movement")
 @export var camera_track_speed: float = 5.0 # Percent Distance /s
 
 @onready var camera: Camera3D = $Camera3D
@@ -163,8 +167,25 @@ func _handle_click() -> void:
 		return
 	
 	var map: RID = nav_agent.get_navigation_map()
+	var hit_pos: Vector3 = hit["position"]
+	var hit_norm: Vector3 = hit["normal"]
+	
+	if mouse_indicator != null:
+		var indicator: Node3D = mouse_indicator.instantiate()
+		get_tree().current_scene.add_child(indicator)
+		
+		var ind_pos := NavigationServer3D.map_get_closest_point(map, hit_pos)
+		indicator.global_position = ind_pos + hit_norm * mouse_indicator_offset
+		
+		var ind_up := hit_norm.normalized()
+		var ind_ref := Vector3.FORWARD if absf(ind_up.dot(Vector3.FORWARD)) < 0.99 else Vector3.RIGHT
+		var ind_x := ind_up.cross(ind_ref).normalized()
+		var ind_z := ind_x.cross(ind_up).normalized()
+		
+		indicator.global_transform.basis = Basis(ind_x, ind_up, ind_z)
+	
 	nav_agent.target_position = NavigationServer3D.map_get_closest_point(
-		map, hit["position"]
+		map, hit_pos
 	)
 	has_destination = true
 
