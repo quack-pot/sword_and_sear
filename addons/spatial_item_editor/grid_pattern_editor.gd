@@ -24,7 +24,7 @@ func _update_property() -> void:
 	for y in height:
 		for x in width:
 			var box := _grid.get_child(y * width + x) as CheckBox
-			box.set_pressed_no_signal(bool(pattern[y][x]))
+			box.set_pressed_no_signal(bool(pattern[y * width + x]))
 
 func _rebuild(width: int, height: int) -> void:
 	for child in _grid.get_children():
@@ -41,13 +41,6 @@ func _rebuild(width: int, height: int) -> void:
 
 func _on_cell_toggled(pressed: bool, x: int, y: int) -> void:
 	var item := get_edited_object() as SpatialItem
-	var new_pattern: Array[Array] = []
-	for row_index in item.grid_height:
-		var new_row: Array = []
-		for col_index in item.grid_width:
-			if row_index == y and col_index == x:
-				new_row.append(pressed)
-			else:
-				new_row.append(bool(item.grid_pattern[row_index][col_index]))
-		new_pattern.append(new_row)
+	var new_pattern: Array[bool] = item.grid_pattern.duplicate()
+	new_pattern[y * item.grid_width + x] = pressed
 	emit_changed(get_edited_property(), new_pattern)
