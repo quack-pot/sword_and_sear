@@ -1,6 +1,11 @@
 class_name InventoryGrid
 extends Control
 
+signal inventory_opened
+signal inventory_closed
+
+static var instance: InventoryGrid
+
 class DragPayload:
 	var id: int
 	var item: InventoryState.InventoryItem
@@ -31,14 +36,23 @@ class ItemPreview extends Control:
 
 @export var closed: bool = true:
 	set(value):
+		var changed: bool = value != closed
 		closed = value
+		mouse_filter = Control.MOUSE_FILTER_IGNORE if closed  else Control.MOUSE_FILTER_STOP
+		
 		_on_inventory_changed()
+		if changed and is_inside_tree():
+			if closed:
+				inventory_closed.emit()
+			else:
+				inventory_opened.emit()
 
 @export_group("Inventory State")
 @export var secondary_provider: InventoryProvider:
 	set(value):
 		_rig_state(secondary_provider, value)
 		secondary_provider = value
+		_on_inventory_changed()
 
 @export_group("Cell Visuals")
 @export var cell_size: Vector2i = Vector2i(32, 32):
@@ -90,9 +104,16 @@ class ItemPreview extends Control:
 
 func _ready() -> void:
 	set_process(false)
-
+	
 	if not PlayerInventory.state_changed.is_connected(_on_inventory_changed):
 		PlayerInventory.state_changed.connect(_on_inventory_changed)
+
+func _enter_tree() -> void:
+	instance = self
+
+func _exit_tree() -> void:
+	if instance == self:
+		instance = null
 
 func _process(_delta: float) -> void:
 	queue_redraw()
@@ -406,3 +427,33 @@ func _draw_item_on(canvas: CanvasItem, spatial: SpatialItem, pos: Vector2, tint:
 				)
 
 				canvas.draw_texture_rect_region(texture, dest, src, tint)
+
+# *=================================================
+# *
+# * Public API
+# *
+# *=================================================
+
+func open(provider: InventoryProvider = null) -> void:
+	if provider != null:
+		secondary_provider = provider
+	
+	closed = false
+
+func close(clear_secondary: bool = true) -> void:
+	closed = true
+
+	if clear_secondary:
+		secondary_provider = null
+
+func toggle(provider: InventoryProvider = null) -> void:
+	if closed:
+		open(provider)
+	else:
+		close(true)
+
+func set_secondary(provider: InventoryProvider) -> void:
+	secondary_provider = provider
+
+func is_open() -> bool:
+	return not closed
