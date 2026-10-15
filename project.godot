@@ -17,6 +17,7 @@ config/icon="uid://b17isn7rp26ht"
 [autoload]
 
 PlayerInventory="*uid://ny78vku5vxpf"
+GlobalInventoryGrid="*uid://bbotu48nw45uu"
 
 [display]
 

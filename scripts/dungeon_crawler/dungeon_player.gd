@@ -231,13 +231,23 @@ func _do_mouse_movement(delta: float) -> void:
 	
 	_apply_horizontal_velocity(target_velocity, step)
 
+func _can_move() -> bool:
+	var inventory_grid: InventoryGrid = InventoryGrid.instance
+	if inventory_grid != null and inventory_grid.is_open():
+		return false
+	
+	return true
+
 func _physics_process(delta: float) -> void:
 	_update_occlusion_target()
 	
-	if do_keyboard_movement:
-		_do_keyboard_movement(delta)
+	if _can_move():
+		if do_keyboard_movement:
+			_do_keyboard_movement(delta)
+		else:
+			_do_mouse_movement(delta)
 	else:
-		_do_mouse_movement(delta)
+		_apply_horizontal_velocity(Vector3.ZERO, deceleration * delta)
 
 func get_inventory() -> InventoryState:
 	return inventory
