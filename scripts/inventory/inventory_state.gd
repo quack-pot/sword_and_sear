@@ -110,6 +110,12 @@ func get_item_id_at(x: int, y: int) -> int:
 func get_item(id: int) -> InventoryItem:
 	return _items.get(id, null)
 
+func get_item_ids() -> Array[int]:
+	return _items.keys()
+
+func get_all_items() -> Array[InventoryItem]:
+	return _items.values()
+
 # *=================================================
 # *
 # * Queries
@@ -122,9 +128,6 @@ func can_place(x: int, y: int, item: SpatialItem) -> bool:
 func can_move(x: int, y: int, id: int) -> bool:
 	var item: InventoryItem = _items.get(id, null)
 	return item != null and _placement_valid_existing(x, y, id, item.metadata)
-
-func get_item_ids() -> Array[int]:
-	return _items.keys()
 
 # *=================================================
 # *
