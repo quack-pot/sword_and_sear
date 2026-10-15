@@ -1,7 +1,10 @@
 [gd_scene format=3 uid="uid://18p8ou3ynbm4"]
 
+[ext_resource type="Script" uid="uid://bo172phniwd2r" path="res://entities/cooking/cooking_minigame.gd" id="1_kttmn"]
+
 [node name="CookingMinigame" type="CanvasLayer" unique_id=1442592822]
 process_mode = 3
+script = ExtResource("1_kttmn")
 
 [node name="Background" type="ColorRect" parent="." unique_id=1510830956]
 anchors_preset = 15

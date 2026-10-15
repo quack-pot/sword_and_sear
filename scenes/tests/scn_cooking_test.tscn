@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://ci078ypis2a7u"]
+
+[ext_resource type="PackedScene" uid="uid://18p8ou3ynbm4" path="res://entities/cooking/cooking_minigame.tscn" id="1_8l6k5"]
+[ext_resource type="Script" uid="uid://bltw88v5xx0sb" path="res://scripts/cooking/dummy_step.gd" id="2_ksadt"]
+
+[node name="CookingMinigame" unique_id=1442592822 instance=ExtResource("1_8l6k5")]
+
+[node name="Step1" type="Control" parent="Steps" parent_id_path=PackedInt32Array(117966849) index="0" unique_id=1273746078]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("2_ksadt")
