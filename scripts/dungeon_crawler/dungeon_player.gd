@@ -1,6 +1,9 @@
 class_name DungeonPlayer
 extends Node3D
 
+@export_group("Player Data")
+@export var inventory: InventoryState = null
+
 @export_group("Wall Cutout")
 @export_flags_3d_physics var occluder_collision_mask: int = 2
 @export var occlusion_sample_offsets: Array[Vector3] = [
@@ -235,3 +238,6 @@ func _physics_process(delta: float) -> void:
 		_do_keyboard_movement(delta)
 	else:
 		_do_mouse_movement(delta)
+
+func get_inventory() -> InventoryState:
+	return inventory

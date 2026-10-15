@@ -1,99 +1,186 @@
 class_name InventoryState
 extends Resource
 
-const EMPTY_INDEX: int = -1
+const EMPTY_ID: int = -1
+
+var _next_item_id: int = 0
+
+class InventoryItem:
+	var metadata: SpatialItem
+	var origin: Vector2i
+
+	func _init(item: SpatialItem, x: int, y: int) -> void:
+		metadata = item
+		origin = Vector2i(x, y)
+
+var _grid: Array[int] = [EMPTY_ID]
+var _items: Dictionary[int, InventoryItem] = {}
 
 @export var width: int = 1:
 	set(value): # These should NEVER change during runtime
 		width = maxi(value, 1)
-		_grid = _fit_pattern(_grid)
+		_resize_grid()
 
 @export var height: int = 1:
 	set(value): # These should NEVER change during runtime
 		height = maxi(value, 1)
-		_grid = _fit_pattern(_grid)
+		_resize_grid()
 
-var _grid: Array[int] = [EMPTY_INDEX]
-var _items: Dictionary[int, SpatialItem] = {}
+# *=================================================
+# *
+# * Helper Methods
+# *
+# *=================================================
 
-var _next_item_id: int = 0
-
-func _fit_pattern(
-	source: Array[int]
-) -> Array[int]:
-	var fitted: Array[int] = []
-	for i in width * height:
-		fitted.append(source[i] if i < source.size() else EMPTY_INDEX)
-	return fitted
+func _resize_grid() -> void:
+	_grid.resize(width * height)
+	_grid.fill(EMPTY_ID)
 
 func _in_bounds(x: int, y: int) -> bool:
 	return x >= 0 and y >= 0 and x < width and y < height
 
 func _item_fits(x: int, y: int, item: SpatialItem) -> bool:
 	return (
-		x >= 0
-		and y >= 0
-		and x + item.grid_width <= width
-		and y + item.grid_height <= height
+		x >= 0 and
+		y >= 0 and
+		x + item.grid_width <= width and
+		y + item.grid_height <= height
 	)
-
-func get_item(x: int, y: int) -> SpatialItem:
-	if not _in_bounds(x, y):
-		return null
-	
-	var item_id: int = _grid[y * width + x]
-	if item_id == EMPTY_INDEX:
-		return null
-	
-	return _items[item_id]
 
 func _placement_valid(x: int, y: int, item: SpatialItem) -> bool:
 	if item == null or not _item_fits(x, y, item):
 		return false
 	
-	if item.grid_pattern.size() != item.grid_width * item.grid_height:
+	for iy in item.grid_height:
+		var p_row_idx: int = iy * item.grid_width
+		var g_row_idx: int = (y + iy) * width + x
+		for ix in item.grid_width:
+			if not item.grid_pattern[p_row_idx + ix]:
+				continue
+			
+			if _grid[g_row_idx + ix] != EMPTY_ID:
+				return false
+	
+	return true
+
+func _placement_valid_existing(x: int, y: int, id: int, item: SpatialItem) -> bool:
+	if item == null or not _item_fits(x, y, item):
 		return false
 	
 	for iy in item.grid_height:
+		var p_row_idx: int = iy * item.grid_width
+		var g_row_idx: int = (y + iy) * width + x
 		for ix in item.grid_width:
-			if not item.grid_pattern[iy * item.grid_width + ix]:
+			if not item.grid_pattern[p_row_idx + ix]:
 				continue
 			
-			if _grid[(y + iy) * width + (x + ix)] != EMPTY_INDEX:
+			var grid_id: int = _grid[g_row_idx + ix]
+			if grid_id != EMPTY_ID and grid_id != id:
 				return false
+	
+	return true
+
+func _stamp(x: int, y: int, id: int, item: SpatialItem) -> void:
+	for iy in item.grid_height:
+		var p_row_idx: int = iy * item.grid_width
+		var g_row_idx: int = (y + iy) * width + x
+		for ix in item.grid_width:
+			if not item.grid_pattern[p_row_idx + ix]:
+				continue
+			
+			_grid[g_row_idx + ix] = id
+
+# *=================================================
+# *
+# * Getters
+# *
+# *=================================================
+
+func get_width() -> int:
+	return width
+
+func get_height() -> int:
+	return height
+
+func get_item_id_at(x: int, y: int) -> int:
+	if not _in_bounds(x, y):
+		return EMPTY_ID
+	return _grid[y * width + x]
+
+func get_item(id: int) -> InventoryItem:
+	return _items.get(id, null)
+
+# *=================================================
+# *
+# * Queries
+# *
+# *=================================================
+
+func can_place(x: int, y: int, item: SpatialItem) -> bool:
+	return _placement_valid(x, y, item)
+
+func can_move(x: int, y: int, id: int) -> bool:
+	var item: InventoryItem = _items.get(id, null)
+	return item != null and _placement_valid_existing(x, y, id, item.metadata)
+
+func get_item_ids() -> Array[int]:
+	return _items.keys()
+
+# *=================================================
+# *
+# * Modification
+# *
+# *=================================================
+
+func try_move(x: int, y: int, id: int) -> bool:
+	var item: InventoryItem = _items.get(id, null)
+	if item == null:
+		return false
+	
+	if not _placement_valid_existing(x, y, id, item.metadata):
+		return false
+	
+	for idx in _grid.size():
+		if _grid[idx] == id:
+			_grid[idx] = EMPTY_ID
+	
+	_stamp(x, y, id, item.metadata)
+	item.origin = Vector2i(x, y)
+	emit_changed()
 	
 	return true
 
 func try_place(x: int, y: int, item: SpatialItem) -> bool:
 	if not _placement_valid(x, y, item):
 		return false
-		
+	
 	var id: int = _next_item_id
 	_next_item_id += 1
+
+	_items.set(id, InventoryItem.new(item, x, y))
+	_stamp(x, y, id, item)
 	
-	_items.set(id, item)
-	
-	for iy in item.grid_height:
-		for ix in item.grid_width:
-			if not item.grid_pattern[iy * item.grid_width + ix]:
-				continue
-			
-			_grid[(y + iy) * width + (x + ix)] = id
-	
+	emit_changed()
 	return true
 
-func remove(x: int, y: int) -> void:
-	var index: int = y * width + x
-	if index < 0 or index >= _grid.size():
-		return
+func remove_by_id(id: int) -> SpatialItem:
+	var item: InventoryItem = _items[id]
+	if item == null:
+		return null
 	
-	var item_id: int = _grid[index]
-	if item_id == EMPTY_INDEX:
-		return
-	
-	var item: SpatialItem = _items[item_id]
-	_items.erase(item_id)
-	
+	_items.erase(id)
 	for idx in _grid.size():
-		if _grid[idx] == item_id:
-			_grid[idx] = EMPTY_INDEX
+		if _grid[idx] == id:
+			_grid[idx] = EMPTY_ID
+	
+	emit_changed()
+	return item.metadata
+
+func remove(x: int, y: int) -> SpatialItem:
+	var item_id: int = get_item_id_at(x, y)
+	return null if item_id == EMPTY_ID else remove_by_id(item_id)
+
+func clear() -> void:
+	_items.clear()
+	_grid.fill(EMPTY_ID)
+	_next_item_id = 0
