@@ -6,10 +6,11 @@ const EMPTY_ID: int = -1
 var _next_item_id: int = 0
 
 class InventoryItem:
+	var id: int
 	var metadata: SpatialItem
 	var origin: Vector2i
 
-	func _init(item: SpatialItem, x: int, y: int) -> void:
+	func _init(id: int, item: SpatialItem, x: int, y: int) -> void:
 		metadata = item
 		origin = Vector2i(x, y)
 
@@ -160,7 +161,7 @@ func try_place(x: int, y: int, item: SpatialItem) -> bool:
 	var id: int = _next_item_id
 	_next_item_id += 1
 
-	_items.set(id, InventoryItem.new(item, x, y))
+	_items.set(id, InventoryItem.new(id, item, x, y))
 	_stamp(x, y, id, item)
 	
 	emit_changed()
