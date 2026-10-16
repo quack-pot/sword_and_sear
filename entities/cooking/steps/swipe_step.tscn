@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://53rkssmwyeln" path="res://entities/cooking/steps/swipe_step.gd" id="1_7ymlh"]
 [ext_resource type="Texture2D" uid="uid://b733btj6kqxc1" path="res://assets/art/Cabbage Thing/Recipe_Rolling_Cabbage_Sheet.png" id="1_t1x0f"]
 [ext_resource type="Texture2D" uid="uid://g1llfhwttm88" path="res://assets/art/Icons/arrow.png" id="2_jwvia"]
+[ext_resource type="AudioStream" uid="uid://dveasq0c0oh80" path="res://assets/audio/Sword_n_Sear_SFX/Crunchish.wav" id="4_0w07o"]
 
 [node name="SwipeStep" type="Control" unique_id=521356604]
 layout_mode = 3
@@ -21,6 +22,10 @@ texture = ExtResource("1_t1x0f")
 hframes = 14
 
 [node name="Arrow" type="Sprite2D" parent="." unique_id=375630284]
-position = Vector2(880, 300)
+position = Vector2(576, 500)
 scale = Vector2(4, 4)
 texture = ExtResource("2_jwvia")
+
+[node name="Swipe" type="AudioStreamPlayer" parent="." unique_id=251910350]
+stream = ExtResource("4_0w07o")
+max_polyphony = 5
