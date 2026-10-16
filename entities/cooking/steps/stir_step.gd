@@ -1,6 +1,6 @@
 extends CookingStep
 
-@export var stirs: int = 12
+@export var stirs: int = 24
 @export var time_limit: float = 6.0
 @export var tilt_degrees: float = 45.0
 @export var sway: float = 8.0
