@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://crt1l7e83h6bx"]
+
+[ext_resource type="PackedScene" uid="uid://18p8ou3ynbm4" path="res://entities/cooking/cooking_minigame.tscn" id="1_8u1vy"]
+[ext_resource type="PackedScene" uid="uid://vi3dxf0t1mdv" path="res://entities/cooking/steps/mash_step.tscn" id="2_5od8x"]
+[ext_resource type="PackedScene" uid="uid://66gd6qgs7slf" path="res://entities/cooking/steps/swipe_step.tscn" id="3_ua4lh"]
+[ext_resource type="PackedScene" uid="uid://bwwp80heecamt" path="res://entities/cooking/steps/stir_step.tscn" id="4_mppyv"]
+[ext_resource type="Texture2D" uid="uid://11pi4gghke3" path="res://assets/art/Cabbage Thing/Cabbage_Pot.png" id="5_5od8x"]
+
+[node name="CookingMinigame" unique_id=1442592822 instance=ExtResource("1_8u1vy")]
+dish_texture = ExtResource("5_5od8x")
+
+[node name="PeelLeaves" parent="Steps" parent_id_path=PackedInt32Array(117966849) index="0" unique_id=1578428101 instance=ExtResource("2_5od8x")]
+layout_mode = 1
+prompt = "Mash Space to Peel!"
+
+[node name="Roll1" parent="Steps" parent_id_path=PackedInt32Array(117966849) index="1" unique_id=521356604 instance=ExtResource("3_ua4lh")]
+layout_mode = 1
+prompt = "Mouse Click and Swipe to Fold!"
+
+[node name="Roll2" parent="Steps" parent_id_path=PackedInt32Array(117966849) index="2" unique_id=1974261916 instance=ExtResource("3_ua4lh")]
+layout_mode = 1
+prompt = "One more time!"
+
+[node name="Simmer" parent="Steps" parent_id_path=PackedInt32Array(117966849) index="3" unique_id=1434367213 instance=ExtResource("4_mppyv")]
+layout_mode = 1
+prompt = "A/LeftArrow and D/RightArrow to Stir!"

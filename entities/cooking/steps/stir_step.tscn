@@ -7,6 +7,8 @@
 [ext_resource type="Texture2D" uid="uid://dc3754bsskqui" path="res://assets/art/Cabbage Thing/Cabbage_Pot_Cabbage 2.png" id="4_r233u"]
 [ext_resource type="Texture2D" uid="uid://bkmsdkh281a8g" path="res://assets/art/Cabbage Thing/Cabbage_Pot_Spoon.png" id="5_8cf8r"]
 [ext_resource type="Texture2D" uid="uid://bhlx8txepefa6" path="res://assets/art/Cabbage Thing/Cabbage_Pot_Pot Front.png" id="6_0mb7u"]
+[ext_resource type="AudioStream" uid="uid://be0gdekac57cb" path="res://assets/audio/Sword_n_Sear_SFX/Simmeringish.wav" id="8_r233u"]
+[ext_resource type="AudioStream" uid="uid://sup4sm0rr02v" path="res://assets/audio/Sword_n_Sear_SFX/Stirrish.wav" id="9_8cf8r"]
 
 [node name="StirStep" type="Control" unique_id=1434367213]
 layout_mode = 3
@@ -61,3 +63,12 @@ offset_top = 600.0
 offset_right = 776.0
 offset_bottom = 624.0
 show_percentage = false
+
+[node name="Simmering" type="AudioStreamPlayer" parent="." unique_id=2033792969]
+stream = ExtResource("8_r233u")
+volume_db = -5.0
+autoplay = true
+
+[node name="Stir" type="AudioStreamPlayer" parent="." unique_id=1423845608]
+stream = ExtResource("9_8cf8r")
+max_polyphony = 4

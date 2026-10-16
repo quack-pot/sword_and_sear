@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://bftgubbkhtcfx" path="res://assets/art/Cabbage Thing/Cabbage_Rolls.png" id="2_qoxl6"]
 [ext_resource type="PackedScene" uid="uid://vi3dxf0t1mdv" path="res://entities/cooking/steps/mash_step.tscn" id="3_hifn3"]
 [ext_resource type="PackedScene" uid="uid://66gd6qgs7slf" path="res://entities/cooking/steps/swipe_step.tscn" id="4_6g7uk"]
+[ext_resource type="PackedScene" uid="uid://bwwp80heecamt" path="res://entities/cooking/steps/stir_step.tscn" id="5_wvll1"]
 
 [node name="CookingMinigame" unique_id=1442592822 instance=ExtResource("1_8l6k5")]
 dish_texture = ExtResource("2_qoxl6")
@@ -15,21 +16,24 @@ prompt = "Peel - mash Space!"
 
 [node name="SwipeStep" parent="Steps" parent_id_path=PackedInt32Array(117966849) index="1" unique_id=521356604 instance=ExtResource("4_6g7uk")]
 layout_mode = 1
-sequence = Array[Vector2]([Vector2(0, -1), Vector2(1, 0), Vector2(-1, 0), Vector2(0, -1), Vector2(0, 1)])
-key_frames = Array[int]([2, 4, 6, 8, 13])
-frame_time = 0.06
-min_drag = 40.0
-mistake_penalty = 0.2
 prompt = "Roll - Swipe in direction!"
 
-[node name="Step1" type="Control" parent="Steps" parent_id_path=PackedInt32Array(117966849) index="2" unique_id=1273746078]
+[node name="StirStep" parent="Steps" parent_id_path=PackedInt32Array(117966849) index="2" unique_id=1434367213 instance=ExtResource("5_wvll1")]
+layout_mode = 1
+offset_left = 853.1699
+offset_top = -96.8
+offset_right = 853.1699
+offset_bottom = -96.79999
+prompt = "Stir - (A/<-) and (D/->) keys"
+
+[node name="Step1" type="Control" parent="Steps" parent_id_path=PackedInt32Array(117966849) index="3" unique_id=1273746078]
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("2_ksadt")
 prompt = "Dummy 1 - press Space"
 
-[node name="Step2" type="Control" parent="Steps" parent_id_path=PackedInt32Array(117966849) index="3" unique_id=1054370682]
+[node name="Step2" type="Control" parent="Steps" parent_id_path=PackedInt32Array(117966849) index="4" unique_id=1054370682]
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
