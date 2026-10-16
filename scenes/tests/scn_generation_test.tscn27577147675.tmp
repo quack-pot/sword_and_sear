@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://cd2pv1oownrl3"]
+
+[ext_resource type="Script" uid="uid://dl5nubgpn32i5" path="res://scripts/dungeon_crawler/dungeon_floor_generator.gd" id="1_4e8i3"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_mqlrt"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_iixl2"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_4e8i3"]
+
+[node name="ScnGenerationTest" type="Node3D" unique_id=1515202872]
+script = ExtResource("1_4e8i3")
+cell_size = 1.0
+wall_prefabs = Array[Mesh]([SubResource("BoxMesh_mqlrt"), SubResource("BoxMesh_iixl2")])
+floor_prefabs = Array[Mesh]([SubResource("PlaneMesh_4e8i3")])
