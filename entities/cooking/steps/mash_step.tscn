@@ -2,6 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://0ey8cdb4hy68" path="res://assets/art/Cabbage Thing/To_shreads_you_say.png" id="1_00oh3"]
 [ext_resource type="Script" uid="uid://bbypetsr4fjfd" path="res://entities/cooking/steps/mash_step.gd" id="1_5p4kx"]
+[ext_resource type="AudioStream" uid="uid://dveasq0c0oh80" path="res://assets/audio/Sword_n_Sear_SFX/Crunchish.wav" id="3_85v17"]
 
 [node name="MashStep" type="Control" unique_id=1578428101]
 layout_mode = 3
@@ -34,3 +35,7 @@ offset_top = 520.0
 offset_right = 776.0
 offset_bottom = 547.0
 show_percentage = false
+
+[node name="Crunch" type="AudioStreamPlayer" parent="." unique_id=1749782996]
+stream = ExtResource("3_85v17")
+max_polyphony = 3
