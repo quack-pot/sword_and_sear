@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://dqttl3si2g3a2"]
+
+[ext_resource type="PackedScene" uid="uid://luq6fn1ku6n0" path="res://scenes/tests/scn_character_test.scn" id="1_yjfc5"]
+[ext_resource type="Script" uid="uid://dhmbxnhd525g2" path="res://scenes/tests/cook_debug.gd" id="2_bucqw"]
+[ext_resource type="PackedScene" uid="uid://crt1l7e83h6bx" path="res://entities/cooking/recipes/cabbage_rolls.tscn" id="3_vkup2"]
+
+[node name="ScnCharacterTest" unique_id=897537795 instance=ExtResource("1_yjfc5")]
+
+[node name="CookDebug" type="Node" parent="." index="3" unique_id=643590907]
+script = ExtResource("2_bucqw")
+cooking_scene = ExtResource("3_vkup2")
