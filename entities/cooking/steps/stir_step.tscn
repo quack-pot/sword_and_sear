@@ -1,0 +1,63 @@
+[gd_scene format=3 uid="uid://bwwp80heecamt"]
+
+[ext_resource type="Script" uid="uid://bf58ejumnbduw" path="res://entities/cooking/steps/stir_step.gd" id="1_a3trk"]
+[ext_resource type="Texture2D" uid="uid://csgi3m30c53a" path="res://assets/art/Cabbage Thing/Cabbage_Pot_Pot Back.png" id="1_p4ucs"]
+[ext_resource type="Texture2D" uid="uid://cg1hh04dwp04" path="res://assets/art/Cabbage Thing/Cabbage_Pot_Broth.png" id="2_a3trk"]
+[ext_resource type="Texture2D" uid="uid://yamgoefcvhkf" path="res://assets/art/Cabbage Thing/Cabbage_Pot_Cabbage.png" id="3_tpmwm"]
+[ext_resource type="Texture2D" uid="uid://dc3754bsskqui" path="res://assets/art/Cabbage Thing/Cabbage_Pot_Cabbage 2.png" id="4_r233u"]
+[ext_resource type="Texture2D" uid="uid://bkmsdkh281a8g" path="res://assets/art/Cabbage Thing/Cabbage_Pot_Spoon.png" id="5_8cf8r"]
+[ext_resource type="Texture2D" uid="uid://bhlx8txepefa6" path="res://assets/art/Cabbage Thing/Cabbage_Pot_Pot Front.png" id="6_0mb7u"]
+
+[node name="StirStep" type="Control" unique_id=1434367213]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_a3trk")
+
+[node name="Sprites" type="Node2D" parent="." unique_id=498980298]
+
+[node name="PotBack" type="Sprite2D" parent="Sprites" unique_id=1254714044]
+position = Vector2(576, 340)
+scale = Vector2(4, 4)
+texture = ExtResource("1_p4ucs")
+
+[node name="Broth" type="Sprite2D" parent="Sprites" unique_id=2112828786]
+position = Vector2(576, 340)
+scale = Vector2(4, 4)
+texture = ExtResource("2_a3trk")
+
+[node name="Cabbage" type="Sprite2D" parent="Sprites" unique_id=1495813418]
+position = Vector2(576, 340)
+scale = Vector2(4, 4)
+texture = ExtResource("3_tpmwm")
+
+[node name="Cabbage2" type="Sprite2D" parent="Sprites" unique_id=1083607287]
+position = Vector2(576, 340)
+scale = Vector2(4, 4)
+texture = ExtResource("4_r233u")
+
+[node name="SpoonPivot" type="Node2D" parent="Sprites" unique_id=400745306]
+position = Vector2(571, 160)
+metadata/_edit_group_ = true
+
+[node name="Spoon" type="Sprite2D" parent="Sprites/SpoonPivot" unique_id=732831537]
+position = Vector2(1, 104)
+scale = Vector2(4, 4)
+texture = ExtResource("5_8cf8r")
+
+[node name="PotFront" type="Sprite2D" parent="Sprites" unique_id=1021042504]
+position = Vector2(576, 340)
+scale = Vector2(4, 4)
+texture = ExtResource("6_0mb7u")
+
+[node name="TimeBar" type="ProgressBar" parent="." unique_id=1843389833]
+layout_mode = 0
+offset_left = 376.0
+offset_top = 600.0
+offset_right = 776.0
+offset_bottom = 624.0
+show_percentage = false
