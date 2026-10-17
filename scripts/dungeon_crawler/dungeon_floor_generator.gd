@@ -339,7 +339,7 @@ func _generate_navigation() -> void:
 	var vertices := PackedVector3Array()
 	var vertex_lookup: Dictionary = {}
 	
-	var nav_y: float = -cell_size
+	var nav_y: float = -0.5
 	
 	for y in height:
 		for x in width:
