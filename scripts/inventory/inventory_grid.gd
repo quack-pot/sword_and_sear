@@ -104,6 +104,7 @@ class ItemPreview extends Control:
 
 func _ready() -> void:
 	set_process(false)
+	mouse_filter = Control.MOUSE_FILTER_IGNORE if closed  else Control.MOUSE_FILTER_STOP
 	
 	if not PlayerInventory.state_changed.is_connected(_on_inventory_changed):
 		PlayerInventory.state_changed.connect(_on_inventory_changed)

@@ -32,8 +32,8 @@ const PLAYER_SCENE = preload("res://entities/dungeon_crawler/dungeon_player.scn"
 @export_category("Visuals")
 @export_range(1, 10, 0.5, "or_greater") var cell_size: float = 2.0
 
-@export var wall_prefabs: Array[Mesh] = []
-@export var floor_prefabs: Array[Mesh] = []
+@export var wall_prefabs: Array[PackedScene] = []
+@export var floor_prefabs: Array[PackedScene] = []
 
 var _grid: Array[Cell] = []
 var _rooms: Array[Rect2i] = []
@@ -69,6 +69,7 @@ func generate_floor(
 	_select_start_and_end()
 
 	_generate_visuals()
+	_generate_navigation()
 	_populate_dungeon(level)
 
 # *=================================================
@@ -278,6 +279,18 @@ func _select_start_and_end() -> void:
 	_end_room = second
 	_room_depth = depths
 
+func _spawn_tile(parent: Node3D, prefabs: Array[PackedScene], x: int, y: int) -> void:
+	if prefabs.is_empty():
+		return
+	
+	var prefab: PackedScene = prefabs[_rng.randi_range(0, prefabs.size() - 1)]
+	if prefab == null:
+		return
+
+	var tile: Node3D = prefab.instantiate() as Node3D
+	parent.add_child(tile)
+	tile.position = Vector3((x + 0.5) * cell_size, 0.0, (y + 0.5) * cell_size)
+
 func _generate_visuals() -> void:
 	for child in get_children():
 		child.queue_free()
@@ -295,46 +308,24 @@ func _generate_visuals() -> void:
 	)
 	add_child(floor_body)
 	
-	var grid_map: GridMap = GridMap.new()
-	
-	grid_map.name = "DungeonGrid"
-	grid_map.cell_size = Vector3(cell_size, cell_size, cell_size)
-	grid_map.cell_center_y = false
-	
-	var lib: MeshLibrary = MeshLibrary.new()
-	var lib_index: int = 0
-	
-	for prefab in floor_prefabs:
-		lib.create_item(lib_index)
-		lib.set_item_name(lib_index, "floor_{lib_index}".format({"lib_index": lib_index}))
-		lib.set_item_mesh(lib_index, prefab)
-		lib_index += 1
-	
-	for prefab in wall_prefabs:
-		lib.create_item(lib_index)
-		lib.set_item_name(lib_index, "wall_{lib_index}".format({"lib_index": lib_index}))
-		lib.set_item_mesh(lib_index, prefab)
-		lib_index += 1
-	
-	grid_map.mesh_library = lib
+	var tiles: Node3D = Node3D.new()
+	tiles.name = "DungeonTiles"
+	add_child(tiles)
 	
 	for y in height:
 		for x in width:
 			if _is_floor(x, y):
-				grid_map.set_cell_item(
-					Vector3i(x, 0, y),
-					randi_range(0, floor_prefabs.size() - 1)
-				)
+				_spawn_tile(tiles, floor_prefabs, x, y)
 			elif _touches_floor(x, y):
-				grid_map.set_cell_item(
-					Vector3i(x, 0, y),
-					floor_prefabs.size() + randi_range(0, wall_prefabs.size() - 1)
-				)
+				_spawn_tile(tiles, wall_prefabs, x, y)
+
 				var wall_body: StaticBody3D = StaticBody3D.new()
 				var wall_collider: CollisionShape3D = CollisionShape3D.new()
 				var wall_shape: BoxShape3D = BoxShape3D.new()
 				wall_shape.size = Vector3(cell_size, cell_size, cell_size)
 				wall_collider.shape = wall_shape
+				wall_body.collision_mask = 2
+				wall_body.collision_layer = 2
 				wall_body.add_child(wall_collider)
 				wall_body.position = Vector3(
 					(x + 0.5) * cell_size,
@@ -342,8 +333,35 @@ func _generate_visuals() -> void:
 					(y + 0.5) * cell_size
 				)
 				add_child(wall_body)
+
+func _generate_navigation() -> void:
+	var nav_mesh := NavigationMesh.new()
+	var vertices := PackedVector3Array()
+	var vertex_lookup: Dictionary = {}
 	
-	add_child(grid_map)
+	var nav_y: float = -cell_size
+	
+	for y in height:
+		for x in width:
+			if not _is_floor(x, y):
+				continue
+			
+			var corners: Array[int] = []
+			
+			for corner in [Vector2i(x, y), Vector2i(x + 1, y), Vector2i(x + 1, y + 1), Vector2i(x, y + 1)]:
+				if not vertex_lookup.has(corner):
+					vertex_lookup[corner] = vertices.size()
+					vertices.append(Vector3(corner.x * cell_size, nav_y, corner.y * cell_size))
+				corners.append(vertex_lookup[corner])
+				
+			nav_mesh.add_polygon(PackedInt32Array(corners))
+	
+	nav_mesh.vertices = vertices
+	
+	var region := NavigationRegion3D.new()
+	region.name = "DungeonNavRegion"
+	region.navigation_mesh = nav_mesh
+	add_child(region)
 
 func _populate_dungeon(_level: int) -> void:
 	var start_room_center: Vector2i = _room_center(_start_room)

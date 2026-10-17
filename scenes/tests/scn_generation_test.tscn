@@ -1,15 +1,15 @@
 [gd_scene format=3 uid="uid://cd2pv1oownrl3"]
 
 [ext_resource type="Script" uid="uid://dl5nubgpn32i5" path="res://scripts/dungeon_crawler/dungeon_floor_generator.gd" id="1_4e8i3"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_mqlrt"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_iixl2"]
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_4e8i3"]
+[ext_resource type="PackedScene" uid="uid://bcavt4iobibhy" path="res://entities/dungeon_crawler/wall.scn" id="2_iixl2"]
+[ext_resource type="PackedScene" uid="uid://cqroag4yv1u3j" path="res://entities/dungeon_crawler/floor.scn" id="3_xywsg"]
 
 [node name="ScnGenerationTest" type="Node3D" unique_id=1515202872]
+
+[node name="Node3D" type="Node3D" parent="." unique_id=1126167132]
 script = ExtResource("1_4e8i3")
-cell_size = 3.0
-wall_prefabs = Array[Mesh]([SubResource("BoxMesh_mqlrt"), SubResource("BoxMesh_iixl2")])
-floor_prefabs = Array[Mesh]([SubResource("PlaneMesh_4e8i3")])
+wall_prefabs = Array[PackedScene]([ExtResource("2_iixl2")])
+floor_prefabs = Array[PackedScene]([ExtResource("3_xywsg")])
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=350908870]
+transform = Transform3D(0.91569114, 0.2580648, -0.3080784, 0, 0.7665878, 0.64213955, 0.40188274, -0.5880015, 0.70195764, 0, 0, 0)
