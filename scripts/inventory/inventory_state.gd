@@ -10,7 +10,8 @@ class InventoryItem:
 	var metadata: SpatialItem
 	var origin: Vector2i
 
-	func _init(id: int, item: SpatialItem, x: int, y: int) -> void:
+	func _init(p_id: int, item: SpatialItem, x: int, y: int) -> void:
+		id = p_id
 		metadata = item
 		origin = Vector2i(x, y)
 
