@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Recipe" format=3 uid="uid://coc0rawcr0anw"]
+
+[ext_resource type="PackedScene" uid="uid://crt1l7e83h6bx" path="res://entities/cooking/recipes/cabbage_rolls.tscn" id="1_mjabj"]
+[ext_resource type="Script" uid="uid://dboggjyh5233n" path="res://entities/cooking/recipe.gd" id="1_vkebu"]
+
+[resource]
+script = ExtResource("1_vkebu")
+dish_name = "Cabbage Rolls"
+ingredient = 1
+minigame = ExtResource("1_mjabj")
+metadata/_custom_type_script = "uid://dboggjyh5233n"
