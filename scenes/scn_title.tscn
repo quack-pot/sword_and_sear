@@ -1,0 +1,79 @@
+[gd_scene format=3 uid="uid://c7n67lcjhcm8h"]
+
+[ext_resource type="Script" uid="uid://cv02viwtbfam7" path="res://scripts/ui/title.gd" id="1_title"]
+[ext_resource type="Texture2D" uid="uid://b17isn7rp26ht" path="res://assets/art/Icons/a_sword_and_a_sear.png" id="2_logo"]
+
+[node name="ScnTitle" type="Control" unique_id=142752180]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_title")
+
+[node name="Background" type="ColorRect" parent="." unique_id=534779878]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.06, 0.04, 0.1, 1)
+
+[node name="Logo" type="TextureRect" parent="." unique_id=1865077781]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -96.0
+offset_top = 60.0
+offset_right = 96.0
+offset_bottom = 252.0
+grow_horizontal = 2
+mouse_filter = 2
+texture = ExtResource("2_logo")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="." unique_id=1341417890]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 270.0
+offset_bottom = 340.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 56
+text = "Sword & Sear"
+horizontal_alignment = 1
+
+[node name="StartButton" type="Button" parent="." unique_id=696785824]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -120.0
+offset_top = 60.0
+offset_right = 120.0
+offset_bottom = 112.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 28
+text = "Start"
+
+[node name="Controls" type="Label" parent="." unique_id=282504200]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -64.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 18
+text = "WASD / Arrows: move     Space: attack     E: interact     I: inventory     Right-click food: eat"
+horizontal_alignment = 1

@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="sword_and_sear"
-run/main_scene="uid://cd2pv1oownrl3"
+run/main_scene="uid://c7n67lcjhcm8h"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="uid://b17isn7rp26ht"
 
