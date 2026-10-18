@@ -37,6 +37,7 @@ extends Node3D
 @onready var camera_track_offset: Vector3 = camera.position - rigidbody.position
 
 @export_group("Attack")
+@export var armed: bool = true
 @export_flags_3d_physics var attack_collision_mask: int = 4
 @export var attack_damage: float = 10.0
 @export var attack_windup_time: float = 0.1 # s
@@ -292,6 +293,11 @@ func _start_attack() -> void:
 	facing_dir = attack_dir
 	has_destination = false
 	attack_box_shape.size = attack_hitbox_size
+
+	var frames: SpriteFrames = sprite.sprite_frames
+	var anim_length: float = frames.get_frame_count("attack") / frames.get_animation_speed("attack")
+	var attack_length: float = attack_windup_time + attack_active_time + attack_recovery_time
+	sprite.play("attack", anim_length / attack_length)
  
 func _find_damageable(node: Node) -> Node:
 	while node != null:
@@ -375,13 +381,13 @@ func _update_animation() -> void:
 		sprite.flip_h = false
 	
 	if is_attacking:
-		sprite.play("attack")
 		return
 	
+	var knife: String = "with_knoife" if armed else "without_knoife"
 	if Vector2(vel.x, vel.z).length() > 0.5:
-		sprite.play("move_without_knoife")
+		sprite.play("move_" + knife)
 	else:
-		sprite.play("idle_without_knoife")
+		sprite.play("idle_" + knife)
 
 func take_damage(amount: float, _source: Node3D = null) -> void:
 	PlayerStamina.remove_stamina(floori(amount))
