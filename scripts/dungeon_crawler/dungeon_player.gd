@@ -1,9 +1,6 @@
 class_name DungeonPlayer
 extends Node3D
 
-@export_group("Player Data")
-@export var inventory: InventoryState = null
-
 @export_group("Wall Cutout")
 @export_flags_3d_physics var occluder_collision_mask: int = 2
 @export var occlusion_sample_offsets: Array[Vector3] = [
@@ -39,6 +36,16 @@ extends Node3D
 @onready var camera: Camera3D = $Camera3D
 @onready var camera_track_offset: Vector3 = camera.position - rigidbody.position
 
+@export_group("Attack")
+@export_flags_3d_physics var attack_collision_mask: int = 4
+@export var attack_damage: float = 10.0
+@export var attack_windup_time: float = 0.1 # s
+@export var attack_active_time: float = 0.15 # s
+@export var attack_recovery_time: float = 0.2 # s
+@export var attack_cooldown: float = 0.1 # s
+@export var attack_hitbox_size: Vector3 = Vector3(1.5, 1.5, 1.5)
+@export var attack_hitbox_distance: float = 1.2 # m
+
 var up_press: bool = false
 var down_press: bool = false
 var left_press: bool = false
@@ -50,6 +57,15 @@ var has_destination: bool = false
 
 var cutout_target: float = 0.0
 var cutout_amount: float = 0.0
+
+var attack_requested: bool = false
+var is_attacking: bool = false
+var attack_time: float = 0.0
+var attack_cooldown_left: float = 0.0
+var attack_dir: Vector3 = Vector3.RIGHT
+var facing_dir: Vector3 = Vector3.RIGHT
+var attack_already_hit: Dictionary = {}
+var attack_box_shape: BoxShape3D = BoxShape3D.new()
 
 func _get_button(event: InputEvent, action: StringName, previous: bool) -> bool:
 	if event.is_action_pressed(action):
@@ -69,6 +85,9 @@ func _input(event: InputEvent) -> void:
 	input_dir = input_dir.normalized()
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("Attack"):
+		attack_requested = true
+
 	if do_keyboard_movement:
 		return
 	
@@ -239,8 +258,97 @@ func _can_move() -> bool:
 	
 	return true
 
+func _update_facing() -> void:
+	var vel: Vector3 = rigidbody.linear_velocity
+	var horizontal := Vector3(vel.x, 0.0, vel.z)
+	if horizontal.length() > 0.5:
+		facing_dir = horizontal.normalized()
+
+func _get_attack_direction() -> Vector3:
+	if not do_keyboard_movement:
+		var mouse_pos: Vector2 = get_viewport().get_mouse_position()
+		var origin: Vector3 = camera.project_ray_origin(mouse_pos)
+		var normal: Vector3 = camera.project_ray_normal(mouse_pos)
+		var plane := Plane(Vector3.UP, rigidbody.global_position.y)
+		var point: Variant = plane.intersects_ray(origin, normal)
+		if point != null:
+			var dir: Vector3 = (point as Vector3) - rigidbody.global_position
+			dir.y = 0.0
+			if dir.length_squared() > 0.01:
+				return dir.normalized()
+	return facing_dir
+ 
+func _start_attack() -> void:
+	is_attacking = true
+	attack_time = 0.0
+	attack_already_hit.clear()
+	attack_dir = _get_attack_direction()
+	facing_dir = attack_dir
+	has_destination = false
+	attack_box_shape.size = attack_hitbox_size
+ 
+func _find_damageable(node: Node) -> Node:
+	while node != null:
+		if node.has_method("take_damage"):
+			return node
+		node = node.get_parent()
+	return null
+ 
+func _do_hit_check() -> void:
+	var center: Vector3 = rigidbody.global_position + attack_dir * attack_hitbox_distance
+	var hit_basis := Basis.looking_at(attack_dir, Vector3.UP)
+	
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = attack_box_shape
+	query.transform = Transform3D(hit_basis, center)
+	query.collision_mask = attack_collision_mask
+	query.collide_with_bodies = true
+	query.collide_with_areas = true
+	query.exclude = [rigidbody.get_rid()]
+	
+	var results: Array[Dictionary] = get_world_3d().direct_space_state.intersect_shape(query, 32)
+	for result in results:
+		var target: Node = _find_damageable(result["collider"] as Node)
+		if target == null:
+			continue
+		var id: int = target.get_instance_id()
+		if attack_already_hit.has(id):
+			continue
+		attack_already_hit[id] = true
+		target.take_damage(attack_damage, self)
+ 
+func _update_attack(delta: float) -> void:
+	attack_time += delta
+	
+	var active_start: float = attack_windup_time
+	var active_end: float = attack_windup_time + attack_active_time
+	var total: float = active_end + attack_recovery_time
+	
+	if attack_time >= active_start and attack_time < active_end:
+		_do_hit_check()
+	
+	if attack_time >= total:
+		is_attacking = false
+		attack_cooldown_left = attack_cooldown
+	
+	_apply_horizontal_velocity(Vector3.ZERO, deceleration * delta)
+
 func _physics_process(delta: float) -> void:
 	_update_occlusion_target()
+	_update_facing()
+	attack_cooldown_left = maxf(attack_cooldown_left - delta, 0.0)
+	
+	if is_attacking:
+		attack_requested = false
+		_update_attack(delta)
+		return
+	
+	if attack_requested:
+		attack_requested = false
+		if _can_move() and attack_cooldown_left <= 0.0:
+			_start_attack()
+			_update_attack(0.0)
+			return
 	
 	if _can_move():
 		if do_keyboard_movement:
@@ -250,16 +358,20 @@ func _physics_process(delta: float) -> void:
 	else:
 		_apply_horizontal_velocity(Vector3.ZERO, deceleration * delta)
 
-func get_inventory() -> InventoryState:
-	return inventory
-
 func _update_animation() -> void:
 	var vel: Vector3 = rigidbody.linear_velocity
 	var facing: float = vel.dot(camera.global_basis.x)
+	if is_attacking:
+		facing = attack_dir.dot(camera.global_basis.x)
 	if facing < -0.1:
 		sprite.flip_h = true
 	elif facing > 0.1:
 		sprite.flip_h = false
+	
+	if is_attacking:
+		sprite.play("attack")
+		return
+	
 	if Vector2(vel.x, vel.z).length() > 0.5:
 		sprite.play("move_without_knoife")
 	else:
