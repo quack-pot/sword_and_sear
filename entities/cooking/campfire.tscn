@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://cv5rc7oh7wqeo" path="res://entities/cooking/campfire.gd" id="1_yrjws"]
 [ext_resource type="Texture2D" uid="uid://djjw0uksvss2l" path="res://assets/art/Campfire/Campfire_Cooking.png" id="2_1icow"]
 [ext_resource type="Texture2D" uid="uid://bv4vbuamr8avt" path="res://assets/art/Campfire/Campfire_Idle.png" id="3_ctlp0"]
+[ext_resource type="Resource" uid="uid://coc0rawcr0anw" path="res://entities/cooking/recipes/cabbage_rolls_recipe.tres" id="3_i3366"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_rfgnj"]
 atlas = ExtResource("2_1icow")
@@ -120,6 +121,7 @@ radius = 1.5
 
 [node name="Campfire" type="Node3D" unique_id=902191581]
 script = ExtResource("1_yrjws")
+recipes = Array[Object]([ExtResource("3_i3366")])
 
 [node name="Sprite" type="AnimatedSprite3D" parent="." unique_id=1979092184]
 pixel_size = 0.04
@@ -148,20 +150,27 @@ layer = 10
 visible = false
 
 [node name="RecipeList" type="Label" parent="UI" unique_id=327882458]
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 23.0
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -0.5
+offset_top = 215.0
+offset_right = 0.5
+offset_bottom = 240.0
 grow_horizontal = 2
+grow_vertical = 2
 
 [node name="CookButton" type="Button" parent="UI" unique_id=2023552222]
-anchors_preset = 7
+anchors_preset = -1
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -4.0
-offset_top = 72.0
-offset_right = 256.0
-offset_bottom = 120.0
+offset_left = -130.0
+offset_top = -210.0
+offset_right = 130.0
+offset_bottom = -162.0
 grow_horizontal = 2
 grow_vertical = 0
