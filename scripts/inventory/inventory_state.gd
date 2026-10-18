@@ -124,6 +124,9 @@ func get_all_items() -> Array[InventoryItem]:
 # *
 # *=================================================
 
+func is_empty() -> bool:
+	return _items.is_empty()
+
 func can_place(x: int, y: int, item: SpatialItem) -> bool:
 	return _placement_valid(x, y, item)
 

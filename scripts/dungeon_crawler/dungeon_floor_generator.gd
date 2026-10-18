@@ -10,6 +10,7 @@ const DIRS: Array[Vector2i] = [
 ]
 
 const PLAYER_SCENE = preload("res://entities/dungeon_crawler/dungeon_player.scn")
+const STAIR_SCENE = preload("res://entities/dungeon_crawler/stairs.scn")
 
 @export_category("Generation Parameters")
 @export_range(1, 256, 1, "or_greater") var width: int = 64
@@ -66,7 +67,7 @@ var _used_cells: Dictionary = {}
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 func _ready() -> void:
-	generate_floor(0, 0)
+	generate_floor(0, floori(Time.get_unix_time_from_system()) % 100000)
 
 func generate_floor(
 	level: int,
@@ -400,6 +401,7 @@ func _generate_navigation() -> void:
 
 func _populate_dungeon(_level: int) -> void:
 	var start_room_center: Vector2i = _room_center(_start_room)
+	var end_room_center: Vector2i = _room_center(_end_room)
 	
 	var player: Node3D = PLAYER_SCENE.instantiate()
 	player.position = Vector3(
@@ -408,6 +410,14 @@ func _populate_dungeon(_level: int) -> void:
 		start_room_center.y * cell_size
 	)
 	add_child(player)
+
+	var stairs: Node3D = STAIR_SCENE.instantiate()
+	stairs.position = Vector3(
+		end_room_center.x * cell_size,
+		0.0,
+		end_room_center.y * cell_size
+	)
+	add_child(stairs)
 	
 	_used_cells.clear()
 	_spawn_chests()

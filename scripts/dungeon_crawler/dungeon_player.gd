@@ -45,6 +45,7 @@ extends Node3D
 @export var attack_cooldown: float = 0.1 # s
 @export var attack_hitbox_size: Vector3 = Vector3(1.5, 1.5, 1.5)
 @export var attack_hitbox_distance: float = 1.2 # m
+@export var attack_stamina: int = 1
 
 var up_press: bool = false
 var down_press: bool = false
@@ -345,7 +346,7 @@ func _physics_process(delta: float) -> void:
 	
 	if attack_requested:
 		attack_requested = false
-		if _can_move() and attack_cooldown_left <= 0.0:
+		if _can_move() and attack_cooldown_left <= 0.0 and PlayerStamina.has_enough_stamina(attack_stamina):
 			_start_attack()
 			_update_attack(0.0)
 			return
@@ -376,3 +377,9 @@ func _update_animation() -> void:
 		sprite.play("move_without_knoife")
 	else:
 		sprite.play("idle_without_knoife")
+
+func take_damage(amount: float, _source: Node3D = null) -> void:
+	PlayerStamina.remove_stamina(floori(amount))
+
+	if PlayerStamina.get_stamina() <= 0:
+		pass # TODO: Load game over state/scene

@@ -155,6 +155,19 @@ func _draw() -> void:
 		_draw_inventory(layout["state"], layout["rect"])
 	_draw_drop_preview()
 
+func _gui_input(event: InputEvent) -> void:
+	if closed or not (event is InputEventMouseButton):
+		return
+	
+	var mouse_event := event as InputEventMouseButton
+	if mouse_event.button_index != MOUSE_BUTTON_RIGHT or not mouse_event.pressed:
+		return
+	if get_viewport().gui_is_dragging():
+		return
+	
+	_use_item_at(mouse_event.position)
+	accept_event()
+
 func _get_drag_data(at_position: Vector2) -> Variant:
 	var layout: Dictionary = _layout_at(at_position)
 	if layout.is_empty():
@@ -335,6 +348,26 @@ func _resolve_drop(pos: Vector2, payload: DragPayload) -> Dictionary:
 		"origin": origin,
 		"valid": _drop_is_valid(payload, state, origin),
 	}
+
+func _use_item_at(pos: Vector2) -> void:
+	var layout: Dictionary = _layout_at(pos)
+	if layout.is_empty():
+		return
+	
+	var state: InventoryState = layout["state"]
+	var rect: Rect2 = layout["rect"]
+	var cell: Vector2i = _pos_to_cell(rect, pos)
+
+	var id: int = state.get_item_id_at(cell.x, cell.y)
+	if id == InventoryState.EMPTY_ID:
+		return
+	
+	var item: InventoryState.InventoryItem = state.get_item(id)
+	var spatial: SpatialItem = item.metadata
+	
+	PlayerStamina.add_stamina(spatial.stamina)
+	state.remove_by_id(id)
+	queue_redraw()
 
 # *=================================================
 # *
