@@ -387,4 +387,4 @@ func take_damage(amount: float, _source: Node3D = null) -> void:
 	PlayerStamina.remove_stamina(floori(amount))
 
 	if PlayerStamina.get_stamina() <= 0:
-		pass # TODO: Load game over state/scene
+		get_tree().change_scene_to_file("res://scenes/scn_game_over.tscn")
