@@ -26,12 +26,13 @@ func _setup_interactions() -> void:
 	interact_area.body_exited.connect(_on_body_exited)
 
 func _populate_loot() -> void:
-	if loot_table == null:
-		return
-	
 	inventory = InventoryState.new()
 	inventory.width = width
 	inventory.height = height
+
+	if loot_table == null:
+		return
+
 	loot_table.populate_inventory(inventory, target_item_count)
 
 func _ready() -> void:
