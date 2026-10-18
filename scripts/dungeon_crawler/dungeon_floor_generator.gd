@@ -35,14 +35,33 @@ const PLAYER_SCENE = preload("res://entities/dungeon_crawler/dungeon_player.scn"
 @export var wall_prefabs: Array[PackedScene] = []
 @export var floor_prefabs: Array[PackedScene] = []
 
+@export_category("Population")
+@export var spawn_height: float = 0.0
+
+@export_group("Chests")
+@export var chest_scene: PackedScene
+@export_range(0.0, 1.0, 0.005) var chest_chance_per_room: float = 0.05
+@export_range(0, 10, 1, "or_greater") var min_chests: int = 0
+
+@export_group("Enemies")
+@export var enemy_scene: PackedScene
+@export_range(0, 64, 1, "or_greater") var enemy_cluster_count: int = 10
+@export_range(1, 16, 1, "or_greater") var enemy_cluster_size_min: int = 2
+@export_range(1, 16, 1, "or_greater") var enemy_cluster_size_max: int = 4
+@export_range(1.0, 10.0, 0.5, "or_greater") var enemy_cluster_radius: float = 2.5
+@export_range(1.0, 64.0, 1.0, "or_greater") var enemy_cluster_spacing: float = 12.0
+@export_range(0.0, 32.0, 0.5, "or_greater") var enemy_safe_radius: float = 9.0
+
 var _grid: Array[Cell] = []
 var _rooms: Array[Rect2i] = []
 var _room_depth: Array[int] = []
 var _room_edges: Array[Vector2i] = []
-var _corridors: Array[Array] = [] # 2D Array of Vector2i
+var _corridors: Array[Array] = []
 
 var _start_room: int = -1
 var _end_room: int = -1
+
+var _used_cells: Dictionary = {}
 
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
@@ -145,6 +164,16 @@ func _farthest_from(source_index: int) -> int:
 			best_index = index
 	
 	return best_index
+
+func _cell_to_world(cell: Vector2i, y: float = 0.0) -> Vector3:
+	return Vector3((cell.x + 0.5) * cell_size, y, (cell.y + 0.5) * cell_size)
+
+func _shuffle_in_place(items: Array) -> void:
+	for i in range(items.size() - 1, 0, -1):
+		var j: int = _rng.randi_range(0, i)
+		var tmp: Variant = items[i]
+		items[i] = items[j]
+		items[j] = tmp
 
 # *=================================================
 # *
@@ -363,6 +392,12 @@ func _generate_navigation() -> void:
 	region.navigation_mesh = nav_mesh
 	add_child(region)
 
+# *=================================================
+# *
+# * Population
+# *
+# *=================================================
+
 func _populate_dungeon(_level: int) -> void:
 	var start_room_center: Vector2i = _room_center(_start_room)
 	
@@ -373,3 +408,120 @@ func _populate_dungeon(_level: int) -> void:
 		start_room_center.y * cell_size
 	)
 	add_child(player)
+	
+	_used_cells.clear()
+	_spawn_chests()
+	_spawn_enemies()
+
+func _spawn_entity(scene: PackedScene, parent: Node3D, cell: Vector2i) -> void:
+	var entity: Node3D = scene.instantiate() as Node3D
+	if entity == null:
+		push_warning("Spawned scene's root must be a Node3D.")
+		return
+	
+	entity.position = _cell_to_world(cell, spawn_height)
+	parent.add_child(entity)
+	_used_cells[cell] = true
+
+func _random_room_cell(room_index: int) -> Vector2i:
+	var room: Rect2i = _rooms[room_index]
+	var inner: Rect2i = room.grow(-1)
+	if inner.size.x < 1 or inner.size.y < 1:
+		inner = room
+	
+	return Vector2i(
+		_rng.randi_range(inner.position.x, inner.end.x - 1),
+		_rng.randi_range(inner.position.y, inner.end.y - 1)
+	)
+
+func _spawn_chests() -> void:
+	if chest_scene == null:
+		return
+	
+	var eligible: Array[int] = []
+	for idx in _rooms.size():
+		if idx != _start_room:
+			eligible.append(idx)
+	
+	var chest_rooms: Array[int] = []
+	for idx in eligible:
+		if _rng.randf() < chest_chance_per_room:
+			chest_rooms.append(idx)
+	
+	if chest_rooms.size() < min_chests:
+		var pool: Array[int] = []
+		for idx in eligible:
+			if not chest_rooms.has(idx):
+				pool.append(idx)
+		_shuffle_in_place(pool)
+		while chest_rooms.size() < min_chests and not pool.is_empty():
+			chest_rooms.append(pool.pop_back())
+	
+	var container := Node3D.new()
+	container.name = "Chests"
+	add_child(container)
+	
+	for idx in chest_rooms:
+		_spawn_entity(chest_scene, container, _random_room_cell(idx))
+
+func _spawn_enemies() -> void:
+	if enemy_scene == null or enemy_cluster_count <= 0:
+		return
+	
+	var start_center := Vector2(_room_center(_start_room))
+	
+	var candidates: Array[Vector2i] = []
+	for y in height:
+		for x in width:
+			var cell := Vector2i(x, y)
+			if not _is_floor(x, y) or _used_cells.has(cell):
+				continue
+			if Vector2(cell).distance_to(start_center) <= enemy_safe_radius:
+				continue
+			candidates.append(cell)
+	
+	if candidates.is_empty():
+		return
+	
+	var centers: Array[Vector2i] = []
+	var attempts: int = enemy_cluster_count * 30
+	while centers.size() < enemy_cluster_count and attempts > 0:
+		attempts -= 1
+		var candidate: Vector2i = candidates[_rng.randi_range(0, candidates.size() - 1)]
+		
+		var far_enough: bool = true
+		for other in centers:
+			if Vector2(candidate).distance_to(Vector2(other)) < enemy_cluster_spacing:
+				far_enough = false
+				break
+		
+		if far_enough:
+			centers.append(candidate)
+	
+	var container := Node3D.new()
+	container.name = "Enemies"
+	add_child(container)
+	
+	var radius_cells: int = ceili(enemy_cluster_radius)
+	for center in centers:
+		var members: Array[Vector2i] = []
+		for dy in range(-radius_cells, radius_cells + 1):
+			for dx in range(-radius_cells, radius_cells + 1):
+				if Vector2(dx, dy).length() > enemy_cluster_radius:
+					continue
+				
+				var cell: Vector2i = center + Vector2i(dx, dy)
+				if not _is_floor(cell.x, cell.y) or _used_cells.has(cell):
+					continue
+				if Vector2(cell).distance_to(start_center) <= enemy_safe_radius:
+					continue
+				members.append(cell)
+		
+		_shuffle_in_place(members)
+		
+		var count: int = _rng.randi_range(
+			enemy_cluster_size_min,
+			maxi(enemy_cluster_size_min, enemy_cluster_size_max)
+		)
+		for i in mini(count, members.size()):
+			_spawn_entity(enemy_scene, container, members[i])

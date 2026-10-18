@@ -39,6 +39,8 @@ signal died(enemy: DungeonEnemy)
 @export var hurt_animation: StringName = &"hurt"
 @export var death_animation: StringName = &"death"
 @export var hurt_anim_time: float = 0.25 # s
+@export var hurt_flash_color: Color = Color(1.0, 0.2, 0.2)
+@export var hurt_flash_time: float = 0.2 # s
 
 @onready var nav_agent: NavigationAgent3D = $NavigationAgent3D
 @onready var sprite: AnimatedSprite3D = get_node_or_null("AnimatedSprite3D") as AnimatedSprite3D
@@ -55,6 +57,7 @@ var pending_hit: bool = false
 var attack_state_time: float = 0.0
 var hurt_timer: float = 0.0
 var facing_dir: Vector3 = Vector3.RIGHT
+var hurt_tween: Tween = null
 
 func _ready() -> void:
 	health = max_health
@@ -100,6 +103,7 @@ func take_damage(amount: float, _source: Node3D = null) -> void:
 		return
 	
 	health -= amount
+	_flash_hurt()
 	if health <= 0.0:
 		_die()
 		return
@@ -296,3 +300,14 @@ func _update_sprite_flip() -> void:
 		sprite.flip_h = true
 	elif side > 0.1:
 		sprite.flip_h = false
+
+func _flash_hurt() -> void:
+	if sprite == null:
+		return
+	
+	if hurt_tween != null and hurt_tween.is_valid():
+		hurt_tween.kill()
+	
+	sprite.modulate = hurt_flash_color
+	hurt_tween = create_tween()
+	hurt_tween.tween_property(sprite, "modulate", Color.WHITE, hurt_flash_time)
