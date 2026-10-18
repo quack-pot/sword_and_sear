@@ -30,7 +30,7 @@ extends Node3D
 @export var deceleration: float = 60.0 # m/s^2
 
 @onready var rigidbody: RigidBody3D = $RigidBody3D
-@onready var sprite: Sprite3D = $RigidBody3D/Sprite3D
+@onready var sprite: AnimatedSprite3D = $RigidBody3D/Sprite3D
 @onready var nav_agent: NavigationAgent3D = $RigidBody3D/NavigationAgent3D
 
 @export_group("Camera Movement")
@@ -94,7 +94,7 @@ func _do_camera_movement(delta: float) -> void:
 	)
 	RenderingServer.global_shader_parameter_set(
 		"camera_forward",
-		-camera.global_basis.z
+		- camera.global_basis.z
 	)
 
 func _update_occlusion_target() -> void:
@@ -128,6 +128,7 @@ func _update_cutout(delta: float) -> void:
 func _process(delta: float) -> void:
 	_do_camera_movement(delta)
 	_update_cutout(delta)
+	_update_animation()
 
 func _apply_horizontal_velocity(target_velocity: Vector3, step: float) -> void:
 	var vel: Vector3 = rigidbody.linear_velocity
@@ -251,3 +252,15 @@ func _physics_process(delta: float) -> void:
 
 func get_inventory() -> InventoryState:
 	return inventory
+
+func _update_animation() -> void:
+	var vel: Vector3 = rigidbody.linear_velocity
+	var facing: float = vel.dot(camera.global_basis.x)
+	if facing < -0.1:
+		sprite.flip_h = true
+	elif facing > 0.1:
+		sprite.flip_h = false
+	if Vector2(vel.x, vel.z).length() > 0.5:
+		sprite.play("move_without_knoife")
+	else:
+		sprite.play("idle_without_knoife")
