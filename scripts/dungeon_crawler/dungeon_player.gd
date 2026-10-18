@@ -86,6 +86,11 @@ func _input(event: InputEvent) -> void:
 	input_dir = input_dir.normalized()
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("Inventory"):
+		var grid: InventoryGrid = InventoryGrid.instance
+		if grid != null:
+			grid.toggle(null)
+	
 	if event.is_action_pressed("Attack"):
 		attack_requested = true
 
