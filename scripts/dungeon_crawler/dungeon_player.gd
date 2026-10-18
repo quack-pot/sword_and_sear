@@ -68,6 +68,7 @@ var attack_dir: Vector3 = Vector3.RIGHT
 var facing_dir: Vector3 = Vector3.RIGHT
 var attack_already_hit: Dictionary = {}
 var attack_box_shape: BoxShape3D = BoxShape3D.new()
+var is_dead: bool = false
 
 func _get_button(event: InputEvent, action: StringName, previous: bool) -> bool:
 	if event.is_action_pressed(action):
@@ -390,7 +391,11 @@ func _update_animation() -> void:
 		sprite.play("idle_" + knife)
 
 func take_damage(amount: float, _source: Node3D = null) -> void:
+	if is_dead:
+		return
+
 	PlayerStamina.remove_stamina(floori(amount))
 
 	if PlayerStamina.get_stamina() <= 0:
-		get_tree().change_scene_to_file("res://scenes/scn_game_over.tscn")
+		is_dead = true
+		get_tree().change_scene_to_file.call_deferred("res://scenes/scn_game_over.tscn")
