@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://cqroag4yv1u3j" path="res://entities/dungeon_crawler/floor.scn" id="3_6fjkk"]
 [ext_resource type="PackedScene" uid="uid://0x78r47o8k6r" path="res://entities/dungeon_crawler/standard_chest.scn" id="4_6jsnp"]
 [ext_resource type="PackedScene" uid="uid://dwkodh463queh" path="res://entities/dungeon_crawler/cabbage_enemy.scn" id="5_o1tfa"]
-[ext_resource type="Script" uid="uid://b6gdj4pc8icpm" path="res://scripts/stamina/stamina_meter.gd" id="6_iihhf"]
+[ext_resource type="PackedScene" path="res://entities/ui/stamina_meter.tscn" id="6_iihhf"]
 
 [sub_resource type="Environment" id="Environment_iixl2"]
 background_mode = 1
@@ -21,6 +21,8 @@ volumetric_fog_albedo = Color(0, 0, 0, 1)
 
 [node name="Node3D" type="Node3D" parent="." unique_id=1126167132]
 script = ExtResource("1_i7qep")
+width = 32
+height = 32
 wall_prefabs = Array[PackedScene]([ExtResource("2_iihhf")])
 floor_prefabs = Array[PackedScene]([ExtResource("3_6fjkk")])
 chest_scene = ExtResource("4_6jsnp")
@@ -32,24 +34,4 @@ transform = Transform3D(0.91569114, 0.2580648, -0.3080784, 0, 0.7665878, 0.64213
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=943662893]
 environment = SubResource("Environment_iixl2")
 
-[node name="Control" type="Control" parent="." unique_id=1506930171]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-
-[node name="VSlider" type="VSlider" parent="Control" unique_id=777716916]
-layout_mode = 1
-anchors_preset = 9
-anchor_bottom = 1.0
-offset_right = 16.0
-grow_vertical = 2
-mouse_filter = 2
-editable = false
-scrollable = false
-tick_count = 10
-ticks_on_borders = true
-script = ExtResource("6_iihhf")
+[node name="StaminaMeter" parent="." instance=ExtResource("6_iihhf")]

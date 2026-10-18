@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://b6gdj4pc8icpm" path="res://scripts/stamina/stamina_meter.gd" id="1_meter"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0.08, 0.06, 0.12, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fill"]
+bg_color = Color(0.95, 0.65, 0.2, 1)
+
+[node name="StaminaMeter" type="CanvasLayer"]
+process_mode = 3
+layer = 2
+
+[node name="Label" type="Label" parent="."]
+offset_left = 16.0
+offset_top = 10.0
+offset_right = 336.0
+offset_bottom = 36.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 20
+text = "STAMINA"
+
+[node name="Bar" type="ProgressBar" parent="."]
+offset_left = 16.0
+offset_top = 38.0
+offset_right = 336.0
+offset_bottom = 66.0
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_fill")
+script = ExtResource("1_meter")

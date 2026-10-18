@@ -8,6 +8,10 @@ signal finished(grade: Grade)
 @export var perfect_threshold := 0.8
 @export var dish_texture: Texture2D
 
+@export var perfect_stamina := 100
+@export var good_stamina := 60
+@export var ruined_stamina := 20
+
 @onready var steps: Control = $Steps
 @onready var prompt: Label = $Prompt
 @onready var result: Control = $Result
@@ -47,16 +51,22 @@ func _on_step_done(score: float) -> void:
 
 func _show_result() -> void:
 	var average = total / steps.get_child_count()
+	var stamina_gain: int
 	if average >= perfect_threshold:
 		grade = Grade.PERFECT
+		stamina_gain = perfect_stamina
 	elif average >= good_threshold:
 		grade = Grade.GOOD
+		stamina_gain = good_stamina
 	else:
 		grade = Grade.RUINED
+		stamina_gain = ruined_stamina
+
+	PlayerStamina.add_stamina(stamina_gain)
 
 	prompt.hide()
 	result.show()
-	grade_label.text = Grade.keys()[grade]
+	grade_label.text = "%s  +%d stamina" % [Grade.keys()[grade], stamina_gain]
 
 	if grade == Grade.RUINED:
 		dish.modulate = Color(0.35, 0.3, 0.3) # make it look burnt
