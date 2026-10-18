@@ -10,7 +10,8 @@ class InventoryItem:
 	var metadata: SpatialItem
 	var origin: Vector2i
 
-	func _init(id: int, item: SpatialItem, x: int, y: int) -> void:
+	func _init(p_id: int, item: SpatialItem, x: int, y: int) -> void:
+		id = p_id
 		metadata = item
 		origin = Vector2i(x, y)
 
@@ -122,6 +123,9 @@ func get_all_items() -> Array[InventoryItem]:
 # * Queries
 # *
 # *=================================================
+
+func is_empty() -> bool:
+	return _items.is_empty()
 
 func can_place(x: int, y: int, item: SpatialItem) -> bool:
 	return _placement_valid(x, y, item)

@@ -16,6 +16,8 @@ extends Resource
 		grid_height = maxi(value, 1)
 		_remap_pattern(grid_width, old_height)
 
+@export_range(0, PlayerStamina.MAX_STAMINA, 1) var stamina: int = PlayerStamina.MAX_STAMINA >> 1
+
 @export var grid_pattern: Array[bool] = [true]:
 	set(value):
 		grid_pattern = _fit_pattern(value)
