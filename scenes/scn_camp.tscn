@@ -1,0 +1,70 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/camp/camp_room.gd" id="1_room"]
+[ext_resource type="PackedScene" uid="uid://bcavt4iobibhy" path="res://entities/dungeon_crawler/wall.scn" id="2_wall"]
+[ext_resource type="PackedScene" uid="uid://cqroag4yv1u3j" path="res://entities/dungeon_crawler/floor.scn" id="3_floor"]
+[ext_resource type="PackedScene" path="res://entities/dungeon_crawler/dungeon_player.scn" id="4_player"]
+[ext_resource type="PackedScene" uid="uid://i7oif8qahco0" path="res://entities/cooking/campfire.tscn" id="5_campfire"]
+[ext_resource type="PackedScene" path="res://entities/dungeon_crawler/stairs.scn" id="6_stairs"]
+[ext_resource type="Script" uid="uid://b6gdj4pc8icpm" path="res://scripts/stamina/stamina_meter.gd" id="7_meter"]
+
+[sub_resource type="Environment" id="Environment_camp"]
+background_mode = 1
+fog_enabled = true
+fog_mode = 1
+fog_light_color = Color(0.06866169, 0.05347036, 0.15123051, 1)
+fog_density = 1.0
+fog_depth_end = 20.0
+volumetric_fog_density = 0.005
+volumetric_fog_albedo = Color(0, 0, 0, 1)
+
+[node name="ScnCamp" type="Node3D"]
+
+[node name="Room" type="Node3D" parent="."]
+script = ExtResource("1_room")
+floor_prefab = ExtResource("3_floor")
+wall_prefab = ExtResource("2_wall")
+
+[node name="DungeonPlayer" parent="." instance=ExtResource("4_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 7)
+
+[node name="Campfire" parent="." instance=ExtResource("5_campfire")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 5)
+
+[node name="FireLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1.5, 5.5)
+light_color = Color(1, 0.6, 0.25, 1)
+light_energy = 2.0
+omni_range = 8.0
+
+[node name="Stairs" parent="." instance=ExtResource("6_stairs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 10)
+next_scene = "res://scenes/scn_dungeon.tscn"
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.91569114, 0.2580648, -0.3080784, 0, 0.7665878, 0.64213955, 0.40188274, -0.5880015, 0.70195764, 0, 0, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_camp")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="VSlider" type="VSlider" parent="Control"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 16.0
+grow_vertical = 2
+mouse_filter = 2
+editable = false
+scrollable = false
+tick_count = 10
+ticks_on_borders = true
+script = ExtResource("7_meter")
