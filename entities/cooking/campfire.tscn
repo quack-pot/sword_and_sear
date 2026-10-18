@@ -1,0 +1,167 @@
+[gd_scene format=3 uid="uid://i7oif8qahco0"]
+
+[ext_resource type="Script" uid="uid://cv5rc7oh7wqeo" path="res://entities/cooking/campfire.gd" id="1_yrjws"]
+[ext_resource type="Texture2D" uid="uid://djjw0uksvss2l" path="res://assets/art/Campfire/Campfire_Cooking.png" id="2_1icow"]
+[ext_resource type="Texture2D" uid="uid://bv4vbuamr8avt" path="res://assets/art/Campfire/Campfire_Idle.png" id="3_ctlp0"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rfgnj"]
+atlas = ExtResource("2_1icow")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i3366"]
+atlas = ExtResource("2_1icow")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cv1v3"]
+atlas = ExtResource("2_1icow")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0h6fp"]
+atlas = ExtResource("2_1icow")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l2qr6"]
+atlas = ExtResource("3_ctlp0")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_soxwb"]
+atlas = ExtResource("3_ctlp0")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bw6tr"]
+atlas = ExtResource("3_ctlp0")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0dnok"]
+atlas = ExtResource("3_ctlp0")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jscmj"]
+atlas = ExtResource("3_ctlp0")
+region = Rect2(256, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bejrc"]
+atlas = ExtResource("3_ctlp0")
+region = Rect2(320, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_d44sk"]
+atlas = ExtResource("3_ctlp0")
+region = Rect2(384, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o40pq"]
+atlas = ExtResource("3_ctlp0")
+region = Rect2(448, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3vr6y"]
+atlas = ExtResource("3_ctlp0")
+region = Rect2(512, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1isbd"]
+atlas = ExtResource("3_ctlp0")
+region = Rect2(576, 0, 64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_5nal4"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rfgnj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i3366")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cv1v3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0h6fp")
+}],
+"loop": 1,
+"name": &"cook",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l2qr6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_soxwb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bw6tr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0dnok")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jscmj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bejrc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_d44sk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o40pq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3vr6y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1isbd")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 10.0
+}]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_5nal4"]
+radius = 1.5
+
+[node name="Campfire" type="Node3D" unique_id=902191581]
+script = ExtResource("1_yrjws")
+
+[node name="Sprite" type="AnimatedSprite3D" parent="." unique_id=1979092184]
+pixel_size = 0.04
+billboard = 1
+texture_filter = 0
+sprite_frames = SubResource("SpriteFrames_5nal4")
+animation = &"idle"
+autoplay = "idle"
+frame_progress = 0.069001585
+
+[node name="Area3D" type="Area3D" parent="." unique_id=728155223]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=413280514]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
+shape = SubResource("SphereShape3D_5nal4")
+
+[node name="Prompt" type="Label3D" parent="." unique_id=1381998539]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.36, 0)
+billboard = 1
+text = "E: Cook"
+font_size = 128
+outline_size = 32
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=502319500]
+layer = 10
+visible = false
+
+[node name="RecipeList" type="Label" parent="UI" unique_id=327882458]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 23.0
+grow_horizontal = 2
+
+[node name="CookButton" type="Button" parent="UI" unique_id=2023552222]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -4.0
+offset_top = 72.0
+offset_right = 256.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 0

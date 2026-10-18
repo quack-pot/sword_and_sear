@@ -3,9 +3,13 @@
 [ext_resource type="PackedScene" uid="uid://luq6fn1ku6n0" path="res://scenes/tests/scn_character_test.scn" id="1_yjfc5"]
 [ext_resource type="Script" uid="uid://dhmbxnhd525g2" path="res://scenes/tests/cook_debug.gd" id="2_bucqw"]
 [ext_resource type="PackedScene" uid="uid://crt1l7e83h6bx" path="res://entities/cooking/recipes/cabbage_rolls.tscn" id="3_vkup2"]
+[ext_resource type="PackedScene" uid="uid://i7oif8qahco0" path="res://entities/cooking/campfire.tscn" id="4_r87h4"]
 
 [node name="ScnCharacterTest" unique_id=897537795 instance=ExtResource("1_yjfc5")]
 
 [node name="CookDebug" type="Node" parent="." index="3" unique_id=643590907]
 script = ExtResource("2_bucqw")
 cooking_scene = ExtResource("3_vkup2")
+
+[node name="Campfire" parent="." index="4" unique_id=902191581 instance=ExtResource("4_r87h4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6636152, 0, 4.2416463)
