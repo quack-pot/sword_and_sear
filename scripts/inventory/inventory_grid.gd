@@ -38,7 +38,7 @@ class ItemPreview extends Control:
 	set(value):
 		var changed: bool = value != closed
 		closed = value
-		mouse_filter = Control.MOUSE_FILTER_IGNORE if closed  else Control.MOUSE_FILTER_STOP
+		mouse_filter = Control.MOUSE_FILTER_IGNORE if closed else Control.MOUSE_FILTER_STOP
 		
 		_on_inventory_changed()
 		if changed and is_inside_tree():
@@ -96,6 +96,11 @@ class ItemPreview extends Control:
 		border_color = value
 		queue_redraw()
 
+@export_group("Sound")
+@export var eat_sound: AudioStream = preload("res://assets/audio/Sword_n_Sear_SFX/Crunchish.wav")
+
+var eat_player: AudioStreamPlayer = AudioStreamPlayer.new()
+
 # *=================================================
 # *
 # * Engine Methods
@@ -104,10 +109,14 @@ class ItemPreview extends Control:
 
 func _ready() -> void:
 	set_process(false)
-	mouse_filter = Control.MOUSE_FILTER_IGNORE if closed  else Control.MOUSE_FILTER_STOP
+	mouse_filter = Control.MOUSE_FILTER_IGNORE if closed else Control.MOUSE_FILTER_STOP
 	
 	if not PlayerInventory.state_changed.is_connected(_on_inventory_changed):
 		PlayerInventory.state_changed.connect(_on_inventory_changed)
+
+	eat_player.stream = eat_sound
+	eat_player.max_polyphony = 3
+	add_child(eat_player)
 
 func _enter_tree() -> void:
 	instance = self
@@ -366,6 +375,8 @@ func _use_item_at(pos: Vector2) -> void:
 	var spatial: SpatialItem = item.metadata
 	
 	PlayerStamina.add_stamina(spatial.stamina)
+	eat_player.pitch_scale = randf_range(0.9, 1.1)
+	eat_player.play()
 	state.remove_by_id(id)
 	queue_redraw()
 
@@ -379,7 +390,7 @@ func _make_drag_preview(item: InventoryState.InventoryItem, grab_offset: Vector2
 	var visual: ItemPreview = ItemPreview.new(self, item.metadata)
 	visual.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	visual.modulate = Color(1.0, 1.0, 1.0, 0.75)
-	visual.position = -(Vector2(grab_offset) * _cell_step() + Vector2(cell_size) * 0.5)
+	visual.position = - (Vector2(grab_offset) * _cell_step() + Vector2(cell_size) * 0.5)
 
 	var root: Control = Control.new()
 	root.add_child(visual)

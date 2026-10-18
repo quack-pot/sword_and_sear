@@ -1,6 +1,8 @@
 class_name Stairs
 extends Node3D
 
+@export_file("*.tscn") var next_scene: String = "res://scenes/scn_camp.tscn"
+
 @onready var interact_area: Area3D = $Area3D
 var in_range: bool = false
 
@@ -21,7 +23,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	
 	if event.is_action_pressed("Interact"):
 		get_viewport().set_input_as_handled()
-		get_tree().change_scene_to_file("res://entities/cooking/campfire.tscn")
+		get_tree().change_scene_to_file(next_scene)
 
 func _on_body_entered(body: Node3D) -> void:
 	if not body.is_in_group("player"):

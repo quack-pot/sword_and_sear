@@ -1,7 +1,7 @@
 class_name DungeonEnemy
 extends CharacterBody3D
 
-enum State { IDLE, CHASE }
+enum State {IDLE, CHASE}
 
 signal died(enemy: DungeonEnemy)
 
@@ -38,9 +38,15 @@ signal died(enemy: DungeonEnemy)
 @export var attack_animation: StringName = &"attack"
 @export var hurt_animation: StringName = &"hurt"
 @export var death_animation: StringName = &"death"
+@export var art_faces_left: bool = true # The cabbage creature is drawn facing left
 @export var hurt_anim_time: float = 0.25 # s
 @export var hurt_flash_color: Color = Color(1.0, 0.2, 0.2)
 @export var hurt_flash_time: float = 0.2 # s
+
+@export_group("Sound")
+@export var crunch_sound: AudioStream = preload("res://assets/audio/Sword_n_Sear_SFX/Crunchish.wav")
+@export var attack_crunch_pitch: float = 0.75
+@export var hurt_crunch_pitch: float = 1.3
 
 @onready var nav_agent: NavigationAgent3D = $NavigationAgent3D
 @onready var sprite: AnimatedSprite3D = get_node_or_null("AnimatedSprite3D") as AnimatedSprite3D
@@ -58,10 +64,15 @@ var attack_state_time: float = 0.0
 var hurt_timer: float = 0.0
 var facing_dir: Vector3 = Vector3.RIGHT
 var hurt_tween: Tween = null
+var crunch_player: AudioStreamPlayer3D = AudioStreamPlayer3D.new()
 
 func _ready() -> void:
 	health = max_health
 	add_to_group("enemies")
+
+	crunch_player.stream = crunch_sound
+	crunch_player.max_polyphony = 3
+	add_child(crunch_player)
 
 func _get_player() -> DungeonPlayer:
 	if player == null or not is_instance_valid(player):
@@ -104,6 +115,7 @@ func take_damage(amount: float, _source: Node3D = null) -> void:
 	
 	health -= amount
 	_flash_hurt()
+	_play_crunch(hurt_crunch_pitch)
 	if health <= 0.0:
 		_die()
 		return
@@ -130,7 +142,7 @@ func _die() -> void:
 	velocity = Vector3.ZERO
 	
 	if _has_animation(death_animation):
-		sprite.play(death_animation)
+		_play_fitted(death_animation, death_delay)
 		if sprite.sprite_frames.get_animation_loop(death_animation):
 			await get_tree().create_timer(death_delay).timeout
 		else:
@@ -252,7 +264,7 @@ func _start_attack() -> void:
 	is_attacking = true
 	pending_hit = true
 	attack_state_time = 0.0
-	_play(attack_animation, true)
+	_play_fitted(attack_animation, attack_lock_time)
 
 func _deal_attack_damage() -> void:
 	if _flat_distance_to_player() > attack_range + attack_hit_tolerance:
@@ -261,11 +273,25 @@ func _deal_attack_damage() -> void:
 	var target: Node = _get_player()
 	if target != null and target.has_method("take_damage"):
 		target.take_damage(attack_damage, self)
+		_play_crunch(attack_crunch_pitch)
 
 func _has_animation(anim: StringName) -> bool:
 	return sprite != null \
 		and sprite.sprite_frames != null \
 		and sprite.sprite_frames.has_animation(anim)
+
+# Plays the whole animation w/n duration seconds
+func _play_fitted(anim: StringName, duration: float) -> void:
+	if not _has_animation(anim):
+		return
+
+	var frames: SpriteFrames = sprite.sprite_frames
+	var length: float = frames.get_frame_count(anim) / frames.get_animation_speed(anim)
+	sprite.play(anim, length / maxf(duration, 0.01))
+
+func _play_crunch(pitch: float) -> void:
+	crunch_player.pitch_scale = pitch * randf_range(0.9, 1.1)
+	crunch_player.play()
 
 func _play(anim: StringName, restart: bool = false) -> void:
 	if not _has_animation(anim):
@@ -296,6 +322,8 @@ func _update_sprite_flip() -> void:
 		return
 	
 	var side: float = facing_dir.dot(camera.global_basis.x)
+	if art_faces_left:
+		side = - side
 	if side < -0.1:
 		sprite.flip_h = true
 	elif side > 0.1:

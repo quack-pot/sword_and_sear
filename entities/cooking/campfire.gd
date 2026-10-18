@@ -83,6 +83,7 @@ func _on_cook_pressed() -> void:
 	cooking_recipe = match_recipe
 	inventory.remove_by_id(match_id)
 	InventoryGrid.instance.close()
+	ui.hide()
 	var minigame: CookingMinigame = cooking_recipe.minigame.instantiate()
 	add_child(minigame)
 	minigame.finished.connect(_on_meal_finished)
