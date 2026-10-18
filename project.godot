@@ -18,6 +18,7 @@ config/icon="uid://b17isn7rp26ht"
 
 PlayerInventory="*uid://ny78vku5vxpf"
 GlobalInventoryGrid="*uid://bbotu48nw45uu"
+PlayerStamina="*uid://dkpckqhktsxu3"
 
 [display]
 
